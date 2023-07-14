@@ -1,18 +1,10 @@
-// Import necessary modules and set up Express app
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
-const { v4: uuidv4 } = require('uuid');
-const mailchimp = require('@mailchimp/mailchimp_marketing');
+const nodemailer = require('nodemailer');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
-
-// Configure Mailchimp API key and list ID
-mailchimp.setConfig({
-    apiKey: '9e98e889029e03a3ee5bbb5c4c3ec441-us21',
-    server: 'us21',
-});
 
 // Serve the HTML template
 app.get('/', (req, res) => {
@@ -24,48 +16,53 @@ app.post('/subscribe', async(req, res) => {
     const { email } = req.body;
 
     try {
-        // Check if the email is already subscribed
-        const response = await mailchimp.lists.getListMember('221f70b044', md5(email));
-        if (response.status === 200 && response.data.status === 'subscribed') {
-            res.send('Email is already subscribed');
-            return;
-        }
-    } catch (error) {
-        console.error('Error checking subscriber status:', error);
-    }
+        // Save the email to Mailchimp list
+        const data = {
+            members: [{
+                email_address: email,
+                status: 'pending',
+            }],
+        };
 
-    try {
-        // Add the email to the Mailchimp list
-        const subscriber = await mailchimp.lists.addListMember('221f70b044.', {
-            email_address: email,
-            status: 'pending',
-            merge_fields: {
-                // Add any additional merge fields as needed
+        await axios({
+            method: 'post',
+            url: `https://usX.api.mailchimp.com/3.0/221f70b044/members`,
+            data: JSON.stringify(data),
+            auth: {
+                username: 'samukele107@gmail.com',
+                password: '9e98e889029e03a3ee5bbb5c4c3ec441-us21',
             },
         });
 
-        // Generate an activation token
-        const activationToken = uuidv4();
-
-        // Send the activation email to the subscriber
-        const activationLink = `http://your-website.com/activate/${activationToken}`;
-        const mailchimpResponse = await mailchimp.messages.send({
-            message: {
-                subject: 'Activate Your Subscription',
-                html: `<p>Click the following link to activate your subscription: <a href="${activationLink}">${activationLink}</a></p>`,
-                from_email: 'sender@example.com',
-                to: [{ email: email }],
+        // Send the activation email
+        const transporter = nodemailer.createTransport({
+            service: 'your_email_service',
+            auth: {
+                user: 'your_email_username',
+                pass: 'your_email_password',
             },
         });
 
-        console.log('Email sent to Mailchimp:', mailchimpResponse);
+        const mailOptions = {
+            from: 'sender@example.com',
+            to: email,
+            subject: 'Activation Email',
+            text: 'Please activate your subscription',
+            html: '<p>Please click the following link to activate your subscription: <a href="YOUR_ACTIVATION_LINK">Activate</a></p>',
+        };
 
-        // You can store the activation token and subscriber details in your database for further processing
-
-        res.send('Activation email sent!');
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending activation email:', error);
+                res.status(500).send('Error sending activation email');
+            } else {
+                console.log('Activation email sent:', info.response);
+                res.send('Subscription successful! Activation email sent');
+            }
+        });
     } catch (error) {
-        console.error('Error subscribing and sending activation email:', error);
-        res.status(500).send('Error subscribing and sending activation email');
+        console.error('Error subscribing and saving email:', error);
+        res.status(500).send('Error subscribing');
     }
 });
 
