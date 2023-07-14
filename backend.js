@@ -36,10 +36,10 @@ app.post('/subscribe', async(req, res) => {
 
         // Send the activation email
         const transporter = nodemailer.createTransport({
-            service: 'your_email_service',
+            service: 'Gmail',
             auth: {
-                user: 'your_email_username',
-                pass: 'your_email_password',
+                user: 'samukele107@gmail.com',
+                pass: 'oupvfbofnficdyft',
             },
         });
 
