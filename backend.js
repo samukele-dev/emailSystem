@@ -30,7 +30,7 @@ app.post('/subscribe', async(req, res) => {
             data: JSON.stringify(data),
             auth: {
                 username: 'samukele107@gmail.com',
-                password: '9e98e889029e03a3ee5bbb5c4c3ec441-us21',
+                password: '8cc28f8ec75dfd69f2d3d46a01dcadd7-us21',
             },
         });
 
