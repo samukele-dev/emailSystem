@@ -1,16 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Email Subscription</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 
 <body>
-    <h1>Subscribe to our Newsletter</h1>
-    <form action="/subscribe" method="POST">
-        <input type="email" name="email" placeholder="Enter your email" required>
-        <button type="submit">Subscribe</button>
-    </form>
+    <div class="container">
+        <h1 class="mt-4">Subscribe to our Newsletter</h1>
+        <form action="/subscribe" method="POST">
+            <div class="form-group">
+                <input type="email" class="form-control" name="email" placeholder="Enter your email" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Subscribe</button>
+        </form>
+    </div>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>
